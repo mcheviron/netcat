@@ -9,6 +9,7 @@ import textwrap
 import threading
 
 
+# This is the main drive for command execution in the tool
 def execute(cmd):
     cmd = cmd.strip()
     if not cmd:
@@ -30,6 +31,7 @@ class NetCat:
         else:
             self.send()
 
+    # This will make your host act as a TCP client
     def send(self):
         self.socket.connect((self.args.target, self.args.port))
         if self.buffer:
@@ -55,6 +57,7 @@ class NetCat:
             self.socket.close()
             sys.exit()
 
+    # This will make your host act as a TCP server
     def listen(self):
         self.socket.bind((self.args.target, self.args.port))
         self.socket.listen(5)
@@ -63,11 +66,15 @@ class NetCat:
             client_thread = threading.Thread(target=self.handle, args=(client_socket,))
             client_thread.start()
 
+    # Depending on which of the other three options you choose, it'll be handled with this method
     def handle(self, client_socket):
+        # If you just want to excute a single command on the remote server,
+        # this will excute it and echo back the output from the check_output method
         if self.args.execute:
             output = execute(self.args.execute)
             client_socket.send(output.encode())
 
+        # This will save the uploaded file in the pwd of the receiver
         elif self.args.upload:
             file_buffer = b""
             while True:
@@ -82,6 +89,7 @@ class NetCat:
             message = f"Saved {self.args.upload}"
             client_socket.send(message.encode())
 
+        # This will erect an interactive shell on the remote server
         elif self.args.command:
             cmd_buffer = b""
             while True:
@@ -92,6 +100,8 @@ class NetCat:
                     response = execute(cmd_buffer.decode())
                     if response:
                         client_socket.send(response.encode())
+                    # Clear the buffer after echoing the response back, otherwise it'll keep excuting what's in the buffer indefinitely
+                    # and you won't get control back to the prompt
                     cmd_buffer = b""
                 except Exception as e:
                     print(f"Server died: {e}")
