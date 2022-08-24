@@ -101,6 +101,7 @@ class NetCat:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
+        prog="netcat",
         description="Netcat tool for remote shell",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=textwrap.dedent(
