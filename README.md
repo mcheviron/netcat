@@ -2,7 +2,7 @@
  A simple netcat tool to aid with getting a shell on compromised machines
  
 
-usage: netcat.py [-h] [-c] [-e EXECUTE] [-l] [-p PORT] [-t TARGET] [-u UPLOAD]
+usage: netcat [-h] [-c] [-e EXECUTE] [-l] [-p PORT] [-t TARGET] [-u UPLOAD]
 
 Netcat tool for remote shell
 
