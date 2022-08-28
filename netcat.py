@@ -68,8 +68,8 @@ class NetCat:
 
     # Depending on which of the other three options you choose, it'll be handled with this method
     def handle(self, client_socket):
-        # If you just want to excute a single command on the remote server,
-        # this will excute it and echo back the output from the check_output method
+        # If you just want to execute a single command on the remote server,
+        # this will execute it and echo back the output from the check_output method
         if self.args.execute:
             output = execute(self.args.execute)
             client_socket.send(output.encode())
@@ -100,8 +100,8 @@ class NetCat:
                     response = execute(cmd_buffer.decode())
                     if response:
                         client_socket.send(response.encode())
-                    # Clear the buffer after echoing the response back, otherwise it'll keep excuting what's in the buffer indefinitely
-                    # and you won't get control back to the prompt
+                    # Clear the buffer after echoing the response back, otherwise it'll keep executing what's in the
+                    # buffer indefinitely, and you won't get control back to the prompt
                     cmd_buffer = b""
                 except Exception as e:
                     print(f"Server died: {e}")
@@ -110,31 +110,34 @@ class NetCat:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        prog="netcat",
-        description="Netcat tool for remote shell",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=textwrap.dedent(
-            """Example: 2
-            netcat.py -t 192.168.0.12 -p 9999 -l -c # interactive command shell
-            netcat.py -t 192.168.0.12 -p 9999 -l -u=mytest.txt # upload to file
-            netcat.py -t 192.168.0.12 -p 9999 -l -e=\"cat /etc/passwd\" # execute command
-            echo 'ABC' | ./netcat.py -t 192.168.0.12 -p 135 # echo text to server port 135
-            netcat.py -t 192.168.0.12 -p 9999 # connect to server
-        """
-        ),
-    )
-    parser.add_argument("-c", "--command", action="store_true", help="command shell")
-    parser.add_argument("-e", "--execute", help="execute specified command")
-    parser.add_argument("-l", "--listen", action="store_true", help="listen")
-    parser.add_argument("-p", "--port", type=int, default=9999, help="specified port")
-    parser.add_argument("-t", "--target", default="192.168.1.203", help="specified IP")
-    parser.add_argument("-u", "--upload", help="upload file")
-    args = parser.parse_args()
-    if args.listen:
-        buffer = ""
-    else:
-        buffer = sys.stdin.read()
+    try:
+        parser = argparse.ArgumentParser(
+            prog="netcat",
+            description="Netcat tool for remote shell",
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            epilog=textwrap.dedent(
+                """Example:
+                netcat.py -t 192.168.0.12 -p 9999 -l -c # interactive command shell
+                netcat.py -t 192.168.0.12 -p 9999 -l -u=mytest.txt # upload to file
+                netcat.py -t 192.168.0.12 -p 9999 -l -e=\"cat /etc/passwd\" # execute command
+                echo 'ABC' | ./netcat.py -t 192.168.0.12 -p 135 # echo text to server port 135
+                netcat.py -t 192.168.0.12 -p 9999 # connect to server
+            """
+            ),
+        )
+        parser.add_argument("-c", "--command", action="store_true", help="command shell")
+        parser.add_argument("-e", "--execute", help="execute specified command")
+        parser.add_argument("-l", "--listen", action="store_true", help="listen")
+        parser.add_argument("-p", "--port", type=int, default=9999, help="specified port")
+        parser.add_argument("-t", "--target", default="192.168.1.203", help="specified IP")
+        parser.add_argument("-u", "--upload", help="upload file")
+        args = parser.parse_args()
+        if args.listen:
+            buffer = ""
+        else:
+            buffer = sys.stdin.read()
 
-    nc = NetCat(args, buffer.encode())
-    nc.run()
+        nc = NetCat(args, buffer.encode())
+        nc.run()
+    except KeyboardInterrupt:
+        print("Exiting...")
